@@ -1,0 +1,240 @@
+<!DOCTYPE html>
+<html lang="pt-BR">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Sistema de Gestão de Pendências Imobiliárias</title>
+    <link rel="stylesheet" href="style.css">
+    <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+</head>
+<body>
+    <div class="app-container">
+        <header class="app-header">
+            <div class="header-content">
+                <h1>🏢 Sistema de Gestão de Pendências Imobiliárias</h1>
+                <div class="header-info">
+                    <span id="currentDateTime">-</span>
+                </div>
+            </div>
+        </header>
+
+        <nav class="tab-navigation">
+            <button class="tab-btn active" data-tab="dashboard">📊 PAINEL GERAL</button>
+            <button class="tab-btn" data-tab="database">📋 RELATÓRIO GERAL</button>
+            <button class="tab-btn" data-tab="individual">👥 DESEMPENHO INDIVIDUAL</button>
+            <button class="tab-btn" data-tab="temporal">📅 RELATÓRIOS TEMPORAIS</button>
+        </nav>
+
+        <main class="app-content">
+            <!-- TAB 1: DASHBOARD -->
+            <section id="dashboard" class="tab-content active">
+                <div class="dashboard-grid">
+                    <!-- KPI Cards -->
+                    <div class="kpi-cards">
+                        <div class="kpi-card">
+                            <div class="kpi-label">Pendências Ativas</div>
+                            <div class="kpi-value" id="totalActive">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Críticas (>30 dias)</div>
+                            <div class="kpi-value critical" id="totalCritical">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Concluídas (Mês)</div>
+                            <div class="kpi-value" id="totalCompleted">0</div>
+                        </div>
+                        <div class="kpi-card">
+                            <div class="kpi-label">Taxa de Conclusão</div>
+                            <div class="kpi-value success" id="completionRate">0%</div>
+                        </div>
+                    </div>
+
+                    <!-- Filtros -->
+                    <div class="filters-section">
+                        <h3>🔍 Filtros</h3>
+                        <select id="filterColaborador" class="form-control">
+                            <option value="">Todos os Colaboradores</option>
+                        </select>
+                    </div>
+
+                    <!-- Charts Grid -->
+                    <div class="charts-grid">
+                        <div class="chart-container">
+                            <h3>Distribuição por Status</h3>
+                            <canvas id="statusChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Pendências por Colaborador</h3>
+                            <canvas id="colaboradorChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <div class="chart-container full-width">
+                        <h3>Evolução Temporal (Últimos 30 Dias)</h3>
+                        <canvas id="temporalChart" height="150"></canvas>
+                    </div>
+
+                    <!-- Critical Alerts -->
+                    <div class="alerts-section">
+                        <h3>⚠️ Alertas Críticos (Top 10)</h3>
+                        <table class="table">
+                            <thead>
+                                <tr>
+                                    <th>ID Unidade</th>
+                                    <th>Cliente</th>
+                                    <th>Colaborador</th>
+                                    <th>Dias Decorridos</th>
+                                    <th>Status</th>
+                                </tr>
+                            </thead>
+                            <tbody id="criticalAlertsTable">
+                            </tbody>
+                        </table>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 2: DATABASE -->
+            <section id="database" class="tab-content">
+                <div class="database-section">
+                    <h2>📋 Base de Dados Completa</h2>
+                    <div class="table-controls">
+                        <input type="text" id="searchInput" placeholder="🔍 Buscar..." class="form-control">
+                        <button id="exportBtn" class="btn btn--primary">📥 Exportar CSV</button>
+                    </div>
+                    <table class="table table-full">
+                        <thead>
+                            <tr>
+                                <th onclick="sortTable('id_unidade')">ID Unidade ▼</th>
+                                <th onclick="sortTable('cliente')">Cliente ▼</th>
+                                <th onclick="sortTable('unidades')">Unid. ▼</th>
+                                <th onclick="sortTable('colaborador')">Colaborador ▼</th>
+                                <th onclick="sortTable('data_inclusao')">Data Inclusão ▼</th>
+                                <th onclick="sortTable('data_escrituracao')">Data Escrituração ▼</th>
+                                <th onclick="sortTable('dias')">Dias ▼</th>
+                                <th onclick="sortTable('status')">Status ▼</th>
+                                <th onclick="sortTable('canal')">Canal ▼</th>
+                                <th onclick="sortTable('contatos')">Contatos ▼</th>
+                                <th>Última Atualização ▼</th>
+                            </tr>
+                        </thead>
+                        <tbody id="databaseTable">
+                        </tbody>
+                    </table>
+                    <div class="pagination">
+                        <button id="prevBtn" class="btn btn--secondary">← Anterior</button>
+                        <span id="pageInfo">Página 1</span>
+                        <button id="nextBtn" class="btn btn--secondary">Próxima →</button>
+                    </div>
+                </div>
+            </section>
+
+            <!-- TAB 3: INDIVIDUAL PERFORMANCE -->
+            <section id="individual" class="tab-content">
+                <div class="individual-section">
+                    <h2>👥 Desempenho Individual</h2>
+                    <div class="individual-controls">
+                        <select id="selectColaborador" class="form-control">
+                            <option value="">Selecione um Colaborador</option>
+                        </select>
+                    </div>
+
+                    <div class="individual-metrics">
+                        <div class="metric-card">
+                            <div class="metric-label">Total Atribuído</div>
+                            <div class="metric-value" id="indTotalAssigned">0</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Taxa de Conclusão</div>
+                            <div class="metric-value" id="indCompletionRate">0%</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Tempo Médio</div>
+                            <div class="metric-value" id="indAvgTime">0 dias</div>
+                        </div>
+                        <div class="metric-card">
+                            <div class="metric-label">Pendências Críticas</div>
+                            <div class="metric-value critical" id="indCritical">0</div>
+                        </div>
+                    </div>
+
+                    <div class="individual-charts">
+                        <div class="chart-container">
+                            <h3>📊 Comparativo com a Equipe</h3>
+                            <canvas id="individualChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Tendência de Resolução (Últimos 7 Dias)</h3>
+                            <canvas id="individualTrendChart" height="200"></canvas>
+                        </div>
+                    </div>
+
+                    <h3>Pendências do Colaborador</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>ID Unidade</th>
+                                <th>Cliente</th>
+                                <th>Dias</th>
+                                <th>Status</th>
+                                <th>Contatos</th>
+                            </tr>
+                        </thead>
+                        <tbody id="individualTable">
+                        </tbody>
+                    </table>
+                </div>
+            </section>
+
+            <!-- TAB 4: TEMPORAL REPORTS -->
+            <section id="temporal" class="tab-content">
+                <div class="temporal-section">
+                    <h2>📅 Relatórios Temporais</h2>
+                    <div class="temporal-controls">
+                        <select id="temporalPeriod" class="form-control">
+                            <option value="weekly">Semanal (últimas 4 semanas)</option>
+                            <option value="monthly">Mensal (últimos 12 meses)</option>
+                            <option value="yearly">Anual (últimos 5 anos)</option>
+                        </select>
+                    </div>
+
+                    <h3>Resumo por Período</h3>
+                    <table class="table">
+                        <thead>
+                            <tr>
+                                <th>Período</th>
+                                <th>Total Concluído</th>
+                                <th>Tempo Médio (dias)</th>
+                                <th>Críticas Resolvidas</th>
+                                <th>Taxa de Conclusão</th>
+                            </tr>
+                        </thead>
+                        <tbody id="temporalTable">
+                        </tbody>
+                    </table>
+
+                    <div class="temporal-charts">
+                        <div class="chart-container">
+                            <h3>Pendências Concluídas por Período</h3>
+                            <canvas id="temporalCompletionChart" height="200"></canvas>
+                        </div>
+                        <div class="chart-container">
+                            <h3>Taxa de Conclusão ao Longo do Tempo</h3>
+                            <canvas id="temporalRateChart" height="200"></canvas>
+                        </div>
+                    </div>
+                </div>
+            </section>
+        </main>
+
+        <footer class="app-footer">
+            <p>Sistema de Gestão de Pendências v1.0 | Desenvolvido com ❤️</p>
+            <p>© 2025 - Todos os direitos reservados</p>
+        </footer>
+    </div>
+
+    <div id="toast" class="toast"></div>
+
+    <script src="app.js"></script>
+</body>
+</html>
