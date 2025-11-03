@@ -18,6 +18,25 @@
             </div>
         </header>
 
+        <!-- Import Section -->
+        <div class="import-section">
+            <div class="import-container">
+                <div class="import-header">
+                    <h2>📥 Importar Dados CSV</h2>
+                    <p class="import-subtitle">Selecione um arquivo CSV para importar os dados das pendências</p>
+                </div>
+                <div class="file-input-wrapper">
+                    <input type="file" id="csvFileInput" accept=".csv" class="file-input">
+                    <label for="csvFileInput" class="file-label">
+                        <span class="file-icon">📄</span>
+                        <span class="file-text">Clique para selecionar arquivo CSV</span>
+                    </label>
+                    <div id="fileNameDisplay" class="file-name-display"></div>
+                </div>
+                <button id="importBtn" class="btn btn-import" disabled>Importar Dados</button>
+            </div>
+        </div>
+
         <nav class="tab-navigation">
             <button class="tab-btn active" data-tab="dashboard">📊 PAINEL GERAL</button>
             <button class="tab-btn" data-tab="database">📋 RELATÓRIO GERAL</button>
@@ -36,7 +55,7 @@
                             <div class="kpi-value" id="totalActive">0</div>
                         </div>
                         <div class="kpi-card">
-                            <div class="kpi-label">Críticas (>30 dias)</div>
+                            <div class="kpi-label">Críticas (&gt;30 dias)</div>
                             <div class="kpi-value critical" id="totalCritical">0</div>
                         </div>
                         <div class="kpi-card">
@@ -61,17 +80,23 @@
                     <div class="charts-grid">
                         <div class="chart-container">
                             <h3>Distribuição por Status</h3>
-                            <canvas id="statusChart" height="200"></canvas>
+                            <div class="chart-wrapper">
+                                <canvas id="statusChart"></canvas>
+                            </div>
                         </div>
                         <div class="chart-container">
                             <h3>Pendências por Colaborador</h3>
-                            <canvas id="colaboradorChart" height="200"></canvas>
+                            <div class="chart-wrapper">
+                                <canvas id="colaboradorChart"></canvas>
+                            </div>
                         </div>
                     </div>
 
                     <div class="chart-container full-width">
                         <h3>Evolução Temporal (Últimos 30 Dias)</h3>
-                        <canvas id="temporalChart" height="150"></canvas>
+                        <div class="chart-wrapper">
+                            <canvas id="temporalChart"></canvas>
+                        </div>
                     </div>
 
                     <!-- Critical Alerts -->
@@ -99,28 +124,30 @@
                 <div class="database-section">
                     <h2>📋 Base de Dados Completa</h2>
                     <div class="table-controls">
-                        <input type="text" id="searchInput" placeholder="🔍 Buscar..." class="form-control">
+                        <input type="text" id="searchInput" class="form-control" placeholder="🔍 Buscar...">
                         <button id="exportBtn" class="btn btn--primary">📥 Exportar CSV</button>
                     </div>
-                    <table class="table table-full">
-                        <thead>
-                            <tr>
-                                <th onclick="sortTable('id_unidade')">ID Unidade ▼</th>
-                                <th onclick="sortTable('cliente')">Cliente ▼</th>
-                                <th onclick="sortTable('unidades')">Unid. ▼</th>
-                                <th onclick="sortTable('colaborador')">Colaborador ▼</th>
-                                <th onclick="sortTable('data_inclusao')">Data Inclusão ▼</th>
-                                <th onclick="sortTable('data_escrituracao')">Data Escrituração ▼</th>
-                                <th onclick="sortTable('dias')">Dias ▼</th>
-                                <th onclick="sortTable('status')">Status ▼</th>
-                                <th onclick="sortTable('canal')">Canal ▼</th>
-                                <th onclick="sortTable('contatos')">Contatos ▼</th>
-                                <th>Última Atualização ▼</th>
-                            </tr>
-                        </thead>
-                        <tbody id="databaseTable">
-                        </tbody>
-                    </table>
+                    <div class="table-wrapper">
+                        <table class="table table-full">
+                            <thead>
+                                <tr>
+                                    <th onclick="sortTable('id_unidade')">ID Unidade ▼</th>
+                                    <th onclick="sortTable('cliente')">Cliente ▼</th>
+                                    <th onclick="sortTable('unidades')">Unid. ▼</th>
+                                    <th onclick="sortTable('colaborador')">Colaborador ▼</th>
+                                    <th onclick="sortTable('data_inclusao')">Data Inclusão ▼</th>
+                                    <th onclick="sortTable('data_escrituracao')">Data Escrituração ▼</th>
+                                    <th onclick="sortTable('dias')">Dias ▼</th>
+                                    <th onclick="sortTable('status')">Status ▼</th>
+                                    <th onclick="sortTable('canal')">Canal ▼</th>
+                                    <th onclick="sortTable('contatos')">Contatos ▼</th>
+                                    <th>Última Atualização ▼</th>
+                                </tr>
+                            </thead>
+                            <tbody id="databaseTable">
+                            </tbody>
+                        </table>
+                    </div>
                     <div class="pagination">
                         <button id="prevBtn" class="btn btn--secondary">← Anterior</button>
                         <span id="pageInfo">Página 1</span>
@@ -138,7 +165,6 @@
                             <option value="">Selecione um Colaborador</option>
                         </select>
                     </div>
-
                     <div class="individual-metrics">
                         <div class="metric-card">
                             <div class="metric-label">Total Atribuído</div>
@@ -157,18 +183,20 @@
                             <div class="metric-value critical" id="indCritical">0</div>
                         </div>
                     </div>
-
                     <div class="individual-charts">
                         <div class="chart-container">
                             <h3>📊 Comparativo com a Equipe</h3>
-                            <canvas id="individualChart" height="200"></canvas>
+                            <div class="chart-wrapper">
+                                <canvas id="individualChart"></canvas>
+                            </div>
                         </div>
                         <div class="chart-container">
                             <h3>Tendência de Resolução (Últimos 7 Dias)</h3>
-                            <canvas id="individualTrendChart" height="200"></canvas>
+                            <div class="chart-wrapper">
+                                <canvas id="individualTrendChart"></canvas>
+                            </div>
                         </div>
                     </div>
-
                     <h3>Pendências do Colaborador</h3>
                     <table class="table">
                         <thead>
@@ -197,7 +225,6 @@
                             <option value="yearly">Anual (últimos 5 anos)</option>
                         </select>
                     </div>
-
                     <h3>Resumo por Período</h3>
                     <table class="table">
                         <thead>
@@ -212,15 +239,18 @@
                         <tbody id="temporalTable">
                         </tbody>
                     </table>
-
                     <div class="temporal-charts">
                         <div class="chart-container">
                             <h3>Pendências Concluídas por Período</h3>
-                            <canvas id="temporalCompletionChart" height="200"></canvas>
+                            <div class="chart-wrapper">
+                                <canvas id="temporalCompletionChart"></canvas>
+                            </div>
                         </div>
                         <div class="chart-container">
                             <h3>Taxa de Conclusão ao Longo do Tempo</h3>
-                            <canvas id="temporalRateChart" height="200"></canvas>
+                            <div class="chart-wrapper">
+                                <canvas id="temporalRateChart"></canvas>
+                            </div>
                         </div>
                     </div>
                 </div>
